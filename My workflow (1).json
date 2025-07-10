@@ -14,11 +14,13 @@
       ],
       "id": "f3da2531-7271-456f-9358-2c9a1dec32e0",
       "name": "Google Gemini Chat Model",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "uiU1Xb62sDcS5Hkz",
-          "name": "Google Gemini(PaLM) Api account 2"
-        }
+     "credentials": {
+  "googlePalmApi": {
+    "id": "REPLACE_WITH_YOUR_API_ID",
+    "name": "YOUR_GEMINI_API_ACCOUNT"
+  }
+}
+
       }
     },
     {
