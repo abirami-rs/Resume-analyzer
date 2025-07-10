@@ -1,0 +1,168 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        180,
+        260
+      ],
+      "id": "f3da2531-7271-456f-9358-2c9a1dec32e0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "uiU1Xb62sDcS5Hkz",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an AI assistant specialized in resume parsing and candidate-job matching.\n\nInstructions:\n1. Analyze the resume and extract:\n   - Name\n   - Total experience (in years)\n   - Top 3–5 skills\n   - A short summary (1–2 lines)\n2. Match the resume against the job description and extract:\n   - Job Title\n   - Match percentage (e.g. 75%)\n   - Verdict: Strong Match / Moderate Match / Weak Match\n   - 1-line reason for the verdict\n3. Add a final recommendation line.\n\n⚠️ Output the final result in **simple line-by-line plain text**, as shown in this format:\n\nName: <candidate name>\nExperience: <years>\nTop Skills: <skills>\nSummary: <short summary>\nJob Title: <job title>\nMatch: <percent> — <verdict>\nReason: <reason>\nRecommendation: <your recommendation>\n\nNow analyze the following:\n\nResume: \n[\n{\n\"NAME\": \n\"a\",\n\"EMAIL\": \n\"f@gmail.com\",\n\"UPLOAD \": \n[\n{\n\"filename\": \n\"Untitled design.png\",\n\"mimetype\": \n\"image/png\",\n\"size\": \n265417\n}\n],\n\"submittedAt\": \n\"2025-07-07T21:37:32.910+05:30\",\n\"formMode\": \n\"test\"\n}\n] \n\n\nJob Description:  \nwe want a marketing manager with additional skills\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        140,
+        20
+      ],
+      "id": "ec7de21e-3ae9-4260-b098-611248ed509b",
+      "name": "AI Agent",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "formTitle": "RESUME",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "NAME",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "EMAIL",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "UPLOAD YOUR RESUME",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -120,
+        20
+      ],
+      "id": "76ef455d-a13f-4968-a928-36d4af3f1b1f",
+      "name": "On form submission",
+      "webhookId": "c8cdb4b8-6b61-48e9-be4a-fa9850d8d744"
+    },
+    {
+      "parameters": {
+        "sendTo": "=abizzz307@gmail.com",
+        "subject": "RESUME",
+        "message": "={{ $json.formattedOutput.replace(/(.*?):/g, '<b>$1:</b>').replace(/\\n/g, '<br>') }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        780,
+        0
+      ],
+      "id": "59f6d9c9-0053-4076-9870-d170d12fcc6b",
+      "name": "Send a message",
+      "webhookId": "c82e69b3-b299-4d78-a624-d37a24c6978a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ipKvOSAtNk86ufD2",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      formattedOutput: $json.output.replace(/\\\\n/g, '\\n')\n    }\n  }\n];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        20
+      ],
+      "id": "4ca26682-51a3-4994-9ef9-9045a4e2663f",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8fa476f3-44fa-4ba4-b837-2b86e88720ef",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "01957ef9ee3d45bca3005456700ebe2f502e87b2cc61c3ac7c7ab149f69c3955"
+  },
+  "id": "Dh35j3AErknkMQVQ",
+  "tags": []
+}
